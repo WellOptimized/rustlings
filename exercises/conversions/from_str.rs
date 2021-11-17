@@ -6,6 +6,7 @@
 // You can read more about it at https://doc.rust-lang.org/std/str/trait.FromStr.html
 use std::num::ParseIntError;
 use std::str::FromStr;
+use std::num;
 
 #[derive(Debug, PartialEq)]
 struct Person {
@@ -26,7 +27,7 @@ enum ParsePersonError {
     ParseInt(ParseIntError),
 }
 
-// I AM NOT DONE
+
 
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
@@ -41,6 +42,25 @@ enum ParsePersonError {
 impl FromStr for Person {
     type Err = ParsePersonError;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        if s.len()==0{
+            return Err(ParsePersonError::Empty)
+        }
+        let mut partition=s.split(',');
+        if let Some(name)=partition.next(){
+            if let Some(age)=partition.next(){
+                if let None=partition.next(){
+                    if name.len()==0{
+                        return Err(ParsePersonError::NoName)
+                    }
+                    let x  =  age.parse::<usize>();
+                    match x{
+                        Ok(i) => return Ok(Person{name:String::from(name),age:i}),
+                        Err(e)=>return Err(ParsePersonError::ParseInt(e))
+                    };
+                }
+            }
+        }
+        return Err(ParsePersonError::BadLen)
     }
 }
 
