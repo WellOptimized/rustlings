@@ -6,7 +6,6 @@
 // You can read more about it at https://doc.rust-lang.org/std/str/trait.FromStr.html
 use std::num::ParseIntError;
 use std::str::FromStr;
-use std::num;
 
 #[derive(Debug, PartialEq)]
 struct Person {
@@ -45,21 +44,36 @@ impl FromStr for Person {
         if s.len()==0{
             return Err(ParsePersonError::Empty)
         }
-        let mut partition=s.split(',');
-        if let Some(name)=partition.next(){
-            if let Some(age)=partition.next(){
-                if let None=partition.next(){
-                    if name.len()==0{
-                        return Err(ParsePersonError::NoName)
-                    }
-                    let x  =  age.parse::<usize>();
-                    match x{
-                        Ok(i) => return Ok(Person{name:String::from(name),age:i}),
-                        Err(e)=>return Err(ParsePersonError::ParseInt(e))
-                    };
-                }
-            }
+
+        // let mut partition=s.split(',');
+        // if let Some(name)=partition.next(){
+        //     if let Some(age)=partition.next(){
+        //         if let None=partition.next(){
+        //             if name.len()==0{
+        //                 return Err(ParsePersonError::NoName)
+        //             }
+        //             let x  =  age.parse::<usize>();
+        //             match x{
+        //                 Ok(i) => return Ok(Person{name:String::from(name),age:i}),
+        //                 Err(e)=>return Err(ParsePersonError::ParseInt(e))
+        //             };
+        //         }
+        //     }
+        // }
+
+        let v: Vec<_> = s.split(',').collect();
+        let (name, age) = match &v[..] {
+            [name, age] => (name,age),
+            _ => return Err(ParsePersonError::BadLen)
+        };
+        if name.len()==0{
+            return Err(ParsePersonError::NoName)
+        } 
+        match age.parse::<usize>(){
+            Ok(i) => return Ok(Person{name:name.to_string(),age:i}),
+            Err(e)=>return Err(ParsePersonError::ParseInt(e))
         }
+
         return Err(ParsePersonError::BadLen)
     }
 }

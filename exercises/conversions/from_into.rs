@@ -37,22 +37,33 @@ impl Default for Person {
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
-        let mut partition=s.split(',');
-        if let Some(name)=partition.next(){
-            if let Some(age)=partition.next(){
-                if let None=partition.next(){
-                    if name.len()==0 || age.len()==0{
-                        return Person::default()
-                    }
-                    let x  =  age.parse::<usize>();
-                    match x{
-                        Ok(i) => return Person{name:String::from(name),age:i},
-                        Err(e)=>return Person::default()
-                    };
-                }
-            }
+        // let mut partition=s.split(',');
+        // if let Some(name)=partition.next(){
+        //     if let Some(age)=partition.next(){
+        //         if let None=partition.next(){
+        //             if name.len()==0 || age.len()==0{
+        //                 return Person::default()
+        //             }
+        //             let x  =  age.parse::<usize>();
+        //             match x{
+        //                 Ok(i) => return Person{name:String::from(name),age:i},
+        //                 Err(e)=>return Person::default()
+        //             };
+        //         }
+        //     }
+        // }
+        let v: Vec<_> = s.split(',').collect();
+        let (name, age) = match &v[..] {
+            [name, age] => (name,age),
+            _ => return Person::default()
+        };
+        if name.len()==0 || age.len()==0{
+            return Person::default()
         }
-        Person::default()
+        match age.parse::<usize>(){
+            Ok(i) => return Person{name:name.to_string(),age:i},
+            Err(e)=>return Person::default()
+        }
     }
 }
 
